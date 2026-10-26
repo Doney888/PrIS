@@ -1,0 +1,198 @@
+<?xml version='1.0' encoding='utf-8'?>
+<ns0:definitions xmlns:ns0="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:ns1="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:ns2="http://www.omg.org/spec/DD/20100524/DC" xmlns:ns3="http://www.omg.org/spec/DD/20100524/DI" id="Definitions_Club" targetNamespace="https://example.org/pris/club">
+  <ns0:collaboration id="ClubCollaboration">
+    <ns0:participant id="ClubPool" name="Тренировка клуба" processRef="ClubProcess" />
+  </ns0:collaboration>
+  <ns0:process id="ClubProcess" name="Учёт результатов тренировки" isExecutable="false">
+    <ns0:laneSet id="ClubLanes">
+      <ns0:lane id="admin" name="Администратор">
+        <ns0:flowNodeRef>start</ns0:flowNodeRef>
+        <ns0:flowNodeRef>plan</ns0:flowNodeRef>
+      </ns0:lane>
+      <ns0:lane id="judge" name="Судья / регистратор">
+        <ns0:flowNodeRef>record</ns0:flowNodeRef>
+        <ns0:flowNodeRef>correct</ns0:flowNodeRef>
+        <ns0:flowNodeRef>review</ns0:flowNodeRef>
+        <ns0:flowNodeRef>confirm</ns0:flowNodeRef>
+      </ns0:lane>
+      <ns0:lane id="system" name="ИС: автоматические действия">
+        <ns0:flowNodeRef>validate</ns0:flowNodeRef>
+        <ns0:flowNodeRef>valid</ns0:flowNodeRef>
+        <ns0:flowNodeRef>calc</ns0:flowNodeRef>
+        <ns0:flowNodeRef>publish</ns0:flowNodeRef>
+        <ns0:flowNodeRef>end</ns0:flowNodeRef>
+      </ns0:lane>
+    </ns0:laneSet>
+    <ns0:startEvent id="start" name="Начало">
+      <ns0:outgoing>f1</ns0:outgoing>
+    </ns0:startEvent>
+    <ns0:userTask id="plan" name="Создать занятие; определить участников">
+      <ns0:incoming>f1</ns0:incoming>
+      <ns0:outgoing>f2</ns0:outgoing>
+    </ns0:userTask>
+    <ns0:userTask id="record" name="Внести события партии">
+      <ns0:incoming>f2</ns0:incoming>
+      <ns0:outgoing>f3</ns0:outgoing>
+    </ns0:userTask>
+    <ns0:serviceTask id="validate" name="Проверить данные и повторы">
+      <ns0:incoming>f3</ns0:incoming>
+      <ns0:outgoing>f4</ns0:outgoing>
+      <ns0:incoming>f6</ns0:incoming>
+    </ns0:serviceTask>
+    <ns0:exclusiveGateway id="valid" name="Данные корректны?">
+      <ns0:incoming>f4</ns0:incoming>
+      <ns0:outgoing>f5</ns0:outgoing>
+      <ns0:outgoing>f7</ns0:outgoing>
+    </ns0:exclusiveGateway>
+    <ns0:userTask id="correct" name="Исправить протокол; указать причину">
+      <ns0:incoming>f5</ns0:incoming>
+      <ns0:outgoing>f6</ns0:outgoing>
+      <ns0:incoming>f10</ns0:incoming>
+    </ns0:userTask>
+    <ns0:serviceTask id="calc" name="Рассчитать статистику по событиям">
+      <ns0:incoming>f7</ns0:incoming>
+      <ns0:outgoing>f8</ns0:outgoing>
+    </ns0:serviceTask>
+    <ns0:userTask id="review" name="Проверить протокол">
+      <ns0:incoming>f8</ns0:incoming>
+      <ns0:outgoing>f9</ns0:outgoing>
+    </ns0:userTask>
+    <ns0:exclusiveGateway id="confirm" name="Подтверждён?">
+      <ns0:incoming>f9</ns0:incoming>
+      <ns0:outgoing>f10</ns0:outgoing>
+      <ns0:outgoing>f11</ns0:outgoing>
+    </ns0:exclusiveGateway>
+    <ns0:serviceTask id="publish" name="Опубликовать свод; обновить рейтинг, архив">
+      <ns0:incoming>f11</ns0:incoming>
+      <ns0:outgoing>f12</ns0:outgoing>
+    </ns0:serviceTask>
+    <ns0:endEvent id="end" name="Готово">
+      <ns0:incoming>f12</ns0:incoming>
+    </ns0:endEvent>
+    <ns0:sequenceFlow id="f1" sourceRef="start" targetRef="plan" name="" />
+    <ns0:sequenceFlow id="f2" sourceRef="plan" targetRef="record" name="" />
+    <ns0:sequenceFlow id="f3" sourceRef="record" targetRef="validate" name="" />
+    <ns0:sequenceFlow id="f4" sourceRef="validate" targetRef="valid" name="" />
+    <ns0:sequenceFlow id="f5" sourceRef="valid" targetRef="correct" name="нет">
+      <ns0:conditionExpression>data_valid = false</ns0:conditionExpression>
+    </ns0:sequenceFlow>
+    <ns0:sequenceFlow id="f6" sourceRef="correct" targetRef="validate" name="" />
+    <ns0:sequenceFlow id="f7" sourceRef="valid" targetRef="calc" name="да">
+      <ns0:conditionExpression>data_valid = true</ns0:conditionExpression>
+    </ns0:sequenceFlow>
+    <ns0:sequenceFlow id="f8" sourceRef="calc" targetRef="review" name="" />
+    <ns0:sequenceFlow id="f9" sourceRef="review" targetRef="confirm" name="" />
+    <ns0:sequenceFlow id="f10" sourceRef="confirm" targetRef="correct" name="нет">
+      <ns0:conditionExpression>confirmed = false</ns0:conditionExpression>
+    </ns0:sequenceFlow>
+    <ns0:sequenceFlow id="f11" sourceRef="confirm" targetRef="publish" name="да">
+      <ns0:conditionExpression>confirmed = true</ns0:conditionExpression>
+    </ns0:sequenceFlow>
+    <ns0:sequenceFlow id="f12" sourceRef="publish" targetRef="end" name="" />
+  </ns0:process>
+  <ns1:BPMNDiagram id="ClubDiagram">
+    <ns1:BPMNPlane id="ClubPlane" bpmnElement="ClubCollaboration">
+      <ns1:BPMNShape id="ClubPool_di" bpmnElement="ClubPool" isHorizontal="false">
+        <ns2:Bounds x="10" y="10" width="1170" height="1230" />
+      </ns1:BPMNShape>
+      <ns1:BPMNShape id="admin_di" bpmnElement="admin" isHorizontal="false">
+        <ns2:Bounds x="45" y="10" width="355" height="1230" />
+      </ns1:BPMNShape>
+      <ns1:BPMNShape id="judge_di" bpmnElement="judge" isHorizontal="false">
+        <ns2:Bounds x="400" y="10" width="400" height="1230" />
+      </ns1:BPMNShape>
+      <ns1:BPMNShape id="system_di" bpmnElement="system" isHorizontal="false">
+        <ns2:Bounds x="800" y="10" width="380" height="1230" />
+      </ns1:BPMNShape>
+      <ns1:BPMNShape id="start_di" bpmnElement="start">
+        <ns2:Bounds x="190" y="120" width="36" height="36" />
+      </ns1:BPMNShape>
+      <ns1:BPMNShape id="plan_di" bpmnElement="plan">
+        <ns2:Bounds x="85" y="210" width="250" height="100" />
+      </ns1:BPMNShape>
+      <ns1:BPMNShape id="record_di" bpmnElement="record">
+        <ns2:Bounds x="475" y="320" width="250" height="100" />
+      </ns1:BPMNShape>
+      <ns1:BPMNShape id="validate_di" bpmnElement="validate">
+        <ns2:Bounds x="870" y="430" width="250" height="100" />
+      </ns1:BPMNShape>
+      <ns1:BPMNShape id="valid_di" bpmnElement="valid">
+        <ns2:Bounds x="970" y="560" width="50" height="50" />
+      </ns1:BPMNShape>
+      <ns1:BPMNShape id="correct_di" bpmnElement="correct">
+        <ns2:Bounds x="475" y="550" width="250" height="100" />
+      </ns1:BPMNShape>
+      <ns1:BPMNShape id="calc_di" bpmnElement="calc">
+        <ns2:Bounds x="870" y="690" width="250" height="100" />
+      </ns1:BPMNShape>
+      <ns1:BPMNShape id="review_di" bpmnElement="review">
+        <ns2:Bounds x="475" y="800" width="250" height="100" />
+      </ns1:BPMNShape>
+      <ns1:BPMNShape id="confirm_di" bpmnElement="confirm">
+        <ns2:Bounds x="575" y="940" width="50" height="50" />
+      </ns1:BPMNShape>
+      <ns1:BPMNShape id="publish_di" bpmnElement="publish">
+        <ns2:Bounds x="870" y="1030" width="250" height="100" />
+      </ns1:BPMNShape>
+      <ns1:BPMNShape id="end_di" bpmnElement="end">
+        <ns2:Bounds x="977" y="1160" width="36" height="36" />
+      </ns1:BPMNShape>
+      <ns1:BPMNEdge id="f1_di" bpmnElement="f1">
+        <ns3:waypoint x="208" y="156" />
+        <ns3:waypoint x="208" y="210" />
+      </ns1:BPMNEdge>
+      <ns1:BPMNEdge id="f2_di" bpmnElement="f2">
+        <ns3:waypoint x="335" y="250" />
+        <ns3:waypoint x="600" y="250" />
+        <ns3:waypoint x="600" y="320" />
+      </ns1:BPMNEdge>
+      <ns1:BPMNEdge id="f3_di" bpmnElement="f3">
+        <ns3:waypoint x="725" y="360" />
+        <ns3:waypoint x="995" y="360" />
+        <ns3:waypoint x="995" y="430" />
+      </ns1:BPMNEdge>
+      <ns1:BPMNEdge id="f4_di" bpmnElement="f4">
+        <ns3:waypoint x="995" y="510" />
+        <ns3:waypoint x="995" y="560" />
+      </ns1:BPMNEdge>
+      <ns1:BPMNEdge id="f5_di" bpmnElement="f5">
+        <ns3:waypoint x="970" y="585" />
+        <ns3:waypoint x="725" y="585" />
+      </ns1:BPMNEdge>
+      <ns1:BPMNEdge id="f6_di" bpmnElement="f6">
+        <ns3:waypoint x="725" y="570" />
+        <ns3:waypoint x="810" y="570" />
+        <ns3:waypoint x="810" y="470" />
+        <ns3:waypoint x="870" y="470" />
+      </ns1:BPMNEdge>
+      <ns1:BPMNEdge id="f7_di" bpmnElement="f7">
+        <ns3:waypoint x="995" y="610" />
+        <ns3:waypoint x="995" y="690" />
+      </ns1:BPMNEdge>
+      <ns1:BPMNEdge id="f8_di" bpmnElement="f8">
+        <ns3:waypoint x="870" y="730" />
+        <ns3:waypoint x="600" y="730" />
+        <ns3:waypoint x="600" y="800" />
+      </ns1:BPMNEdge>
+      <ns1:BPMNEdge id="f9_di" bpmnElement="f9">
+        <ns3:waypoint x="600" y="880" />
+        <ns3:waypoint x="600" y="940" />
+      </ns1:BPMNEdge>
+      <ns1:BPMNEdge id="f10_di" bpmnElement="f10">
+        <ns3:waypoint x="575" y="965" />
+        <ns3:waypoint x="440" y="965" />
+        <ns3:waypoint x="440" y="590" />
+        <ns3:waypoint x="475" y="590" />
+      </ns1:BPMNEdge>
+      <ns1:BPMNEdge id="f11_di" bpmnElement="f11">
+        <ns3:waypoint x="625" y="965" />
+        <ns3:waypoint x="995" y="965" />
+        <ns3:waypoint x="995" y="1030" />
+      </ns1:BPMNEdge>
+      <ns1:BPMNEdge id="f12_di" bpmnElement="f12">
+        <ns3:waypoint x="995" y="1110" />
+        <ns3:waypoint x="995" y="1160" />
+      </ns1:BPMNEdge>
+    </ns1:BPMNPlane>
+  </ns1:BPMNDiagram>
+</ns0:definitions>
