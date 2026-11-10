@@ -18,7 +18,7 @@ ASSETS = ROOT / 'diagrams'
 for d in (OUT, ASSETS):
     d.mkdir(exist_ok=True)
 for name, file in [('Arial','arial.ttf'),('ArialB','arialbd.ttf'),('Times','times.ttf'),('TimesB','timesbd.ttf')]:
-    pdfmetrics.registerFont(TTFont(name, str(Path('C:/Windows/Fonts') / file)))
+    pdfmetrics.registerFont(TTFont(name, str(Path('/usr/share/fonts/truetype/dejavu') / {'arial.ttf':'DejaVuSans.ttf','arialbd.ttf':'DejaVuSans-Bold.ttf','times.ttf':'DejaVuSerif.ttf','timesbd.ttf':'DejaVuSerif-Bold.ttf'}[file])))
 pdfmetrics.registerFontFamily('Arial', normal='Arial', bold='ArialB', italic='Arial', boldItalic='ArialB')
 pdfmetrics.registerFontFamily('Times', normal='Times', bold='TimesB', italic='Times', boldItalic='TimesB')
 PORTRAIT = A4
@@ -371,14 +371,14 @@ def build(m):
     report=OUT/'Laba_3_Komanda_19_Otchet.pdf'
     c=canvas.Canvas(str(report),pagesize=PORTRAIT,pageCompression=1)
     c.setTitle('Работа 3. Модели бизнес-процессов бильярдного клуба. Команда 19')
-    c.setAuthor('Борисюк Е. Г.; Езиева Милана; Федорова Мария; Петрова Мария; Муравьев Матвей')
+    c.setAuthor('Борисюк Евгений; Езиева Милана; Федорова Мария; Петрова Мария; Муравьев Матвей')
     page_start(c)
     p(c,'УНИВЕРСИТЕТ ИТМО',48,75,499,15,align=1,font='ArialB')
     p(c,'Проектирование информационных систем',48,116,499,13,align=1)
     p(c,'ЛАБОРАТОРНАЯ РАБОТА № 3',48,218,499,18,align=1,font='ArialB')
     p(c,'Разработка модели бизнес-процессов<br/>с учётом внедрения информационной системы',48,270,499,17,23,align=1)
     p(c,'Организация тренировок и учёт результатов<br/>любительского бильярдного клуба',48,354,499,14,20,align=1)
-    p(c,'Команда № 19<br/><br/>Борисюк Е. Г., группа К3340<br/>Езиева Милана<br/>Федорова Мария<br/>Петрова Мария<br/>Муравьев Матвей',265,466,280,12,17)
+    p(c,'Команда № 19<br/><br/>Борисюк Евгений<br/>Езиева Милана<br/>Федорова Мария<br/>Петрова Мария<br/>Муравьев Матвей',265,466,280,12,17)
     p(c,'Санкт-Петербург<br/>2026',48,741,499,11,16,align=1)
     c.showPage()
     page_start(c,title='1. Цель, исходные данные и границы')
@@ -495,6 +495,9 @@ def build(m):
        'подтверждения, расчёта и хранения, сохраняя ответственность людей за наблюдение и судейские решения. '
        'Результат можно использовать для уточнения регламентов и требований следующей стадии проектирования.',y)
     c.showPage()
+    page_start(c,title='Распределение разделов работы')
+    table(c,['Участник','Раздел','Диаграммы и материалы'],[['Борисюк Евгений', 'Общая модель и проверка протоколов', 'A-0 и A0: листы 1–2 и 6–7; A3: листы 4 и 9'], ['Езиева Милана', 'Регистрация событий и декомпозиция A2', 'A2: листы 3 и 8; связи A2 на A0: листы 2 и 7'], ['Федорова Мария', 'Подготовка занятия и участники процесса', 'A1 на A0: листы 2 и 7; раздел 1 отчёта'], ['Петрова Мария', 'Расчёт статистики и декомпозиция A4', 'A4: листы 5 и 10; A4 на A0: листы 2 и 7'], ['Муравьев Матвей', 'Хранение, сравнение состояний и выводы', 'A5 на A0: листы 2 и 7; разделы 5–6 отчёта']],[125,170,204],100)
+    c.showPage()
     page_start(c,title='Источники и проверка полноты задания')
     y=body(c,'1. Задание №3 «Разработка модели бизнес-процессов с учётом внедрения информационной системы». '
        'Материалы преподавателя, получены 09.11.2026.')
@@ -527,3 +530,4 @@ if __name__=='__main__':
     report=build(m)
     (ROOT/'VALIDATION.md').write_text('# Проверки модели\n\n'+'\n'.join('- '+r for r in checks)+'\n\nВсего: 10 диаграмм. Визуальная проверка выполняется отдельно.\n',encoding='utf-8')
     print(json.dumps({'report':str(report),'pages':PAGE,'checks':len(checks)},ensure_ascii=False))
+
